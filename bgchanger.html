@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+<title>bgchanger</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.1/dist/tf.min.js"></script>
+
+<script> 
+var temp =0;
+var maxlen =25;
+var num_classes = 28
+var word_index = {' ': 4,
+ 'a': 2,
+ 'b': 18,
+ 'c': 11,
+ 'd': 13,
+ 'e': 1,
+ 'f': 22,
+ 'g': 14,
+ 'h': 16,
+ 'i': 5,
+ 'j': 26,
+ 'k': 21,
+ 'l': 7,
+ 'm': 17,
+ 'n': 6,
+ 'o': 8,
+ 'p': 15,
+ 'q': 25,
+ 'r': 3,
+ 's': 10,
+ 't': 9,
+ 'u': 12,
+ 'v': 23,
+ 'w': 20,
+ 'x': 27,
+ 'y': 19,
+ 'z': 24,
+'0':0,};
+
+	
+
+function textsequence(value){
+	var x = value.split('');
+	for (var i=0;i<x.length;i++){
+		x[i] = word_index[x[i]];
+	}
+	return x;
+}
+
+var r,g,b;
+
+function changeBg(){
+
+
+	var res = textsequence(document.getElementById('x').value.toLowerCase().padStart(maxlen,'0'));
+	var temp = tf.oneHot(tf.tensor(res,[res.length,1],'int32'),28).dataSync();
+	
+	//var pred = model.predict(tf.tensor(temp,[1,25,28])).dataSync()
+	(async ()=>{
+    const model = await tf.loadLayersModel('https://raw.githubusercontent.com/mohith01/kerasColor/master/model.json');
+    var pred = model.predict(tf.tensor(temp,[1,25,28])).dataSync();
+	r =  parseInt(pred[0]*255);
+	g =  parseInt(pred[1]*255);
+	b =  parseInt(pred[2]*255);
+	
+
+	
+	document.body.style.background = 'rgb(' + [r,g,b].join(',') + ')';
+	document.body.style.transitionDuration = "1s";
+})();
+	
+	
+}
+</script>
+</HEAD>
+<BODY>
+ Color: <input type="text" id="x" maxlength="25" />
+<input type="button"  value="submit" onclick="changeBg()">
+<button type ="button" onclick="changeBg()">Onclick</button>
+</BODY>
+</HTML>
+
